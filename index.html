@@ -15,7 +15,7 @@
     --text: #eaeaf2;
     --muted: #6868a0;
     --subtle: #2e2e50;
-    --accent: #00c853; /* Этүгэн Ногоон өнгө */
+    --accent: #00c853; 
     --accent-bg: #1a3522;
     --accent-fg: #7aee9a;
   }
@@ -30,6 +30,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow-x: hidden;
   }
 
   body::before {
@@ -141,7 +142,7 @@
   }
 
   .decode-btn:hover { background: #161621; border-color: var(--accent); }
-  .decode-btn.open { color: var(--accent-fg); }
+  .decode-btn.open { color: var(--accent-fg); border-color: var(--accent); }
 
   .lock-icon { width: 14px; height: 14px; opacity: 0.5; flex-shrink: 0; }
 
@@ -162,6 +163,7 @@
   }
 
   .reveal-quote { font-family: 'Noto Serif', serif; font-size: 15px; font-style: italic; line-height: 1.7; margin-bottom: 6px; }
+  .divider { height: 0.5px; background: var(--border); margin: 12px 0; }
   .reveal-mn { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
   .reveal-meaning { font-size: 12px; color: var(--muted); padding-left: 10px; border-left: 2px solid var(--accent); }
   .footer { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--subtle); text-align: center; margin-top: 4px; }
@@ -170,11 +172,12 @@
 <body>
 <div class="card">
   <div class="top-label">Binary Compliments Project</div>
+  
   <div class="person-chip">
-    <div class="avatar" id="avatar">AE</div>
+    <div class="avatar" id="avatar">??</div>
     <div>
-      <div class="chip-name" id="name">Albert Einstein</div>
-      <div class="chip-role" id="role">Физикч · Physicist</div>
+      <div class="chip-name" id="name">Нууц зурвас</div>
+      <div class="chip-role" id="role">Тайлахад бэлэн</div>
     </div>
   </div>
 
@@ -184,39 +187,65 @@
 
   <button class="decode-btn" id="btn" onclick="toggle()">
     <svg class="lock-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="5.5" width="10" height="7.5" rx="1.5"/><path d="M4.5 5.5V4a2.5 2.5 0 015 0v1.5"/><circle cx="7" cy="9.2" r="1" fill="currentColor" stroke="none"/></svg>
-    <span id="btnLabel">КОД ТАЙЛАХ </span>
+    <span id="btnLabel">КОД ТАЙЛАХ</span>
   </button>
 
   <div class="reveal" id="reveal">
-    <div class="reveal-quote" id="quote">"Genius is 1% talent and 99% hard work."</div>
-    <div class="divider" style="height: 0.5px; background: var(--border); margin: 12px 0;"></div>
-    <div class="reveal-mn" id="mnText">Авьяас бол 1%, хичээл зүтгэл бол 99%.</div>
-    <div class="reveal-meaning" id="meaning">Хичээл зүтгэл бол авьяасаас илүү чухал.</div>
+    <div class="reveal-quote" id="quote"></div>
+    <div class="divider"></div>
+    <div class="reveal-mn" id="mnText"></div>
+    <div class="reveal-meaning" id="meaning"></div>
   </div>
+  
   <div class="footer">#Этүгэнсоёл · #Хүнбайхуй · 2026</div>
 </div>
 
 <script>
-// Линкнээс кодыг унших хэсэг
 const urlParams = new URLSearchParams(window.location.search);
-const binaryContent = urlParams.get('code') || "01000111 01100101 01101110 01101001 01110101 01110011"; // Default утга
+const code = urlParams.get('code');
 
+// Эйнштейний тусгай код
+const einsteinCode = "01000001-01110110-01111001-01100001-01100001-01110011-00100000-00110001-00100101-00101100-00100000-01001000-01101001-01100011-01101000-01100101-01100101-01101100-00100000-00111001-00111001-00100101";
+
+// Хоёртын кодыг текст рүү хөрвүүлэх функц
+function binaryToText(bin) {
+    if(!bin) return "";
+    return bin.split('-').map(b => String.fromCharCode(parseInt(b, 2))).join('');
+}
+
+const displayCode = code ? code.replace(/-/g, ' ') : "01000111 01100101 01101110 01101001 01110101 01110011";
+
+// Шивж буй мэт анимац
 (function type() {
   const el = document.getElementById('binText');
   let i = 0;
   const iv = setInterval(() => {
-    if (i >= binaryContent.length) { clearInterval(iv); el.textContent = binaryContent; return; }
-    el.innerHTML = binaryContent.slice(0, i) + '<span class="cursor"></span>';
-    i += 3;
-  }, 30);
+    if (i >= displayCode.length) { clearInterval(iv); el.textContent = displayCode; return; }
+    el.innerHTML = displayCode.slice(0, i) + '<span class="cursor"></span>';
+    i += 2;
+  }, 25);
 })();
+
+// Текстүүдийг оноох
+if (code === einsteinCode) {
+    document.getElementById('avatar').innerText = "AE";
+    document.getElementById('name').innerText = "Albert Einstein";
+    document.getElementById('role').innerText = "Физикч · Physicist";
+    document.getElementById('quote').innerText = '"Genius is 1% talent and 99% hard work."';
+    document.getElementById('mnText').innerText = "Авьяас бол 1%, хичээл зүтгэл бол 99%.";
+    document.getElementById('meaning').innerText = "Хичээл зүтгэл бол авьяасаас илүү чухал.";
+} else {
+    const decoded = binaryToText(code);
+    document.getElementById('mnText').innerText = decoded || "Танд амжилт хүсье!";
+    document.getElementById('meaning').innerText = "";
+}
 
 let open = false;
 function toggle() {
   open = !open;
   document.getElementById('reveal').classList.toggle('show', open);
   document.getElementById('btn').classList.toggle('open', open);
-  document.getElementById('btnLabel').textContent = open ? 'НУУХ' : 'КОД ТАЙЛАХ';
+  document.getElementById('btnLabel').textContent = open ? 'НУУХ'  : 'КОД ТАЙЛАХ';
 }
 </script>
 </body>
