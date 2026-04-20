@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binary Compliments Project</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Serif:ital,wght@1,400;1,600&family=Noto+Sans:wght@400;600&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --surface: #111118;
+    --border: rgba(255,255,255,0.07);
+    --border-hi: rgba(255,255,255,0.13);
+    --text: #eaeaf2;
+    --muted: #6868a0;
+    --subtle: #2e2e50;
+    --accent: #00c853; /* Этүгэн Ногоон өнгө */
+    --accent-bg: #1a3522;
+    --accent-fg: #7aee9a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 44px 44px;
+    pointer-events: none;
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 460px;
+    margin: 2rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .top-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .person-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--surface);
+    border: 0.5px solid var(--border-hi);
+    border-radius: 99px;
+    padding: 5px 14px 5px 5px;
+    width: fit-content;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent-bg);
+    color: var(--accent-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .chip-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .chip-role { font-size: 11px; color: var(--muted); }
+
+  .binary-block {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 1rem 1.1rem 1rem 1.2rem;
+    min-height: 80px;
+  }
+
+  .bin-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    line-height: 2.1;
+    word-break: break-all;
+    letter-spacing: 1.5px;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 12px;
+    background: var(--muted);
+    margin-left: 2px;
+    vertical-align: middle;
+    animation: blink 0.9s step-end infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .decode-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 0.5px solid var(--border-hi);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s;
+  }
+
+  .decode-btn:hover { background: #161621; border-color: var(--accent); }
+  .decode-btn.open { color: var(--accent-fg); }
+
+  .lock-icon { width: 14px; height: 14px; opacity: 0.5; flex-shrink: 0; }
+
+  .reveal {
+    background: var(--surface);
+    border: 0.5px solid var(--border-hi);
+    border-radius: 12px;
+    padding: 1.3rem 1.4rem;
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .reveal.show { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(7px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal-quote { font-family: 'Noto Serif', serif; font-size: 15px; font-style: italic; line-height: 1.7; margin-bottom: 6px; }
+  .reveal-mn { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .reveal-meaning { font-size: 12px; color: var(--muted); padding-left: 10px; border-left: 2px solid var(--accent); }
+  .footer { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--subtle); text-align: center; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top-label">Binary Compliments Project</div>
+  <div class="person-chip">
+    <div class="avatar" id="avatar">AE</div>
+    <div>
+      <div class="chip-name" id="name">Albert Einstein</div>
+      <div class="chip-role" id="role">Физикч · Physicist</div>
+    </div>
+  </div>
+
+  <div class="binary-block">
+    <div class="bin-text" id="binText"></div>
+  </div>
+
+  <button class="decode-btn" id="btn" onclick="toggle()">
+    <svg class="lock-icon" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="5.5" width="10" height="7.5" rx="1.5"/><path d="M4.5 5.5V4a2.5 2.5 0 015 0v1.5"/><circle cx="7" cy="9.2" r="1" fill="currentColor" stroke="none"/></svg>
+    <span id="btnLabel">КОД ТАЙЛАХ </span>
+  </button>
+
+  <div class="reveal" id="reveal">
+    <div class="reveal-quote" id="quote">"Genius is 1% talent and 99% hard work."</div>
+    <div class="divider" style="height: 0.5px; background: var(--border); margin: 12px 0;"></div>
+    <div class="reveal-mn" id="mnText">Авьяас бол 1%, хичээл зүтгэл бол 99%.</div>
+    <div class="reveal-meaning" id="meaning">Хичээл зүтгэл бол авьяасаас илүү чухал.</div>
+  </div>
+  <div class="footer">#Этүгэнсоёл · #Хүнбайхуй · 2026</div>
+</div>
+
+<script>
+// Линкнээс кодыг унших хэсэг
+const urlParams = new URLSearchParams(window.location.search);
+const binaryContent = urlParams.get('code') || "01000111 01100101 01101110 01101001 01110101 01110011"; // Default утга
+
+(function type() {
+  const el = document.getElementById('binText');
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i >= binaryContent.length) { clearInterval(iv); el.textContent = binaryContent; return; }
+    el.innerHTML = binaryContent.slice(0, i) + '<span class="cursor"></span>';
+    i += 3;
+  }, 30);
+})();
+
+let open = false;
+function toggle() {
+  open = !open;
+  document.getElementById('reveal').classList.toggle('show', open);
+  document.getElementById('btn').classList.toggle('open', open);
+  document.getElementById('btnLabel').textContent = open ? 'НУУХ' : 'КОД ТАЙЛАХ';
+}
+</script>
+</body>
+</html>
